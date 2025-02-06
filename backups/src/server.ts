@@ -1,4 +1,5 @@
 import express from 'express';
+import { getSpotifyToken } from './token';
 
 const app = express();
 const PORT:Number=3001;
@@ -9,8 +10,16 @@ app.get('/', (req, res) => {
     res.send(data);
 })
 
+app.get('/token', (req, res) => {
+    getSpotifyToken().then((token) => {
+        res.send(token);
+    });
+})
+
+
 // Server setup
 app.listen(PORT,() => {
     console.log('The application is listening '
-          + 'on port http://localhost:'+PORT);
+        + 'on port http://localhost:'+PORT);
 })
+
