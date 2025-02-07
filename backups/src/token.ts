@@ -1,9 +1,8 @@
 require('dotenv').config();
-let spotifyToken : string | null = null;
 let tokenExpiration: number | null = null;
 
 // check if a token already exists and if it's still valid
-function isTokenValid() {
+function isTokenValid(spotifyToken: string | null) {
     if (spotifyToken === null || tokenExpiration === null) {
         return false;
     }
@@ -12,8 +11,8 @@ function isTokenValid() {
     return tokenExpiration > now;
 }
 
-async function getSpotifyToken() {
-    if (isTokenValid()) {
+async function getSpotifyToken(spotifyToken: string | null) {
+    if (isTokenValid(spotifyToken)) {
         return spotifyToken;
     }
     const CLIENT_ID = process.env.CLIENT_ID;
@@ -28,7 +27,6 @@ async function getSpotifyToken() {
     });
 
     const data = await response.json();
-    spotifyToken = data.access_token;
     tokenExpiration = Math.floor(Date.now() / 1000) + data.expires_in;
     return data.access_token;
 }
