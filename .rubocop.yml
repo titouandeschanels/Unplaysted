@@ -1,8 +1,67 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+inherit_from: .rubocop_todo.yml
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+plugins: rubocop-rails
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+  - "local/**/*"
+  - "bin/**/*"
+  - "db/**/*"
+  - "tmp/**/*"
+  - "test/**/*"
+  - "spec/**/*"
+  - "lib/**/*"
+  - "vendor/**/*"
+  - "config/environments/*"
+  - "config/initializers/pagy.rb"
+  - "config/initializers/simple_form_tailwind.rb"
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+Layout/SpaceInLambdaLiteral:
+  EnforcedStyle: require_space
+
+Metrics/AbcSize:
+  CountRepeatedAttributes: false
+Metrics/ClassLength:
+  CountAsOne: ['array', 'hash', 'heredoc']
+Metrics/MethodLength:
+  CountAsOne: ['array', 'hash', 'heredoc']
+Metrics/ModuleLength:
+  CountAsOne: ['array', 'hash', 'heredoc']
+
+Rails/BulkChangeTable:
+  Enabled: false
+
+Style/AccessModifierDeclarations:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+Style/HashLikeCase:
+  Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/SymbolArray:
+  Enabled: false
+
+Rails/SquishedSQLHeredocs:
+  Enabled: false
+Rails/HasAndBelongsToMany:
+  Enabled: false
+Rails/FindEach:
+  Enabled: false
+Rails/ActionOrder:
+  Enabled: false
+Rails/Pluck:
+  Enabled: false
+Rails/TopLevelHashWithIndifferentAccess:
+  Enabled: false
