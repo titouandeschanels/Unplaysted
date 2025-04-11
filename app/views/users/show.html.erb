@@ -4,6 +4,25 @@
   <div class="user-details">
     <p><strong>Email:</strong> <%= @user.email %></p>
     <p><strong>Spotify ID:</strong> <%= @user.spotify_id %></p>
+    <p><strong>Current Track:</strong> <%= @current_track %></p>
+  </div>
+
+  <div class="playlists">
+    <h2>Playlists</h2>
+    <ul>
+      <% @playlists.each do |playlist| %>
+        <li><%= playlist.name %></li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="tracks">
+    <h2>Tracks</h2>
+    <ul>
+      <% @tracks.each do |track| %>
+        <li><%= track.name %></li>
+      <% end %>
+    </ul>
   </div>
 
   <div class="actions">

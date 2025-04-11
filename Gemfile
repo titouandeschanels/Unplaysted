@@ -66,3 +66,4 @@ end
 
 gem "rspotify"
 gem "omniauth"
+gem "pry"
