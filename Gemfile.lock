@@ -414,6 +414,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  omniauth
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

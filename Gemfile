@@ -65,3 +65,4 @@ group :test do
 end
 
 gem "rspotify"
+gem "omniauth"
