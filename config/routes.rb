@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     member do
       post :play
       post :next_track
+      post :pause
     end
   end
 end

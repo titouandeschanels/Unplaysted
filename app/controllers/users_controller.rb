@@ -51,7 +51,20 @@ class UsersController < ApplicationController
     current_index = @tracks.find_index { |track| track.id == track_id.gsub("spotify:track:", "") }
     session[:current_track_index] = current_index
 
-    @spotify_user.player.play_track(track_uri)
+    if params[:action_type] == "pause"
+      @spotify_user.player.pause
+    elsif params[:action_type] == "resume"
+      @spotify_user.player.play
+    else
+      @spotify_user.player.play_track(track_uri)
+    end
+  end
+
+  def pause
+    @user = current_user
+    @spotify_user = current_spotify_user
+    @spotify_user.player.pause
+    redirect_to play_user_path(@user, id: params[:id])
   end
 
   def next_track
@@ -68,18 +81,14 @@ class UsersController < ApplicationController
     @tracks = @playlist.tracks
 
     if request.post?
-      # Get the current track index from the session or default to 0
       current_index = session[:current_track_index] || 0
 
-      # Move to the next track, or back to the beginning if we're at the end
       next_index = (current_index + 1) % @tracks.length
       session[:current_track_index] = next_index
 
-      # Get the next track
       next_track = @tracks[next_index]
       track_uri = "spotify:track:#{next_track.id}"
 
-      # Play the next track
       @spotify_user.player.play_track(track_uri)
     end
 

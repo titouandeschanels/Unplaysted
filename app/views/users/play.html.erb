@@ -3,17 +3,26 @@
 <head>
   <title>Blind Test</title>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen">
   <div class="max-w-3xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Blind Test</h1>
+    <div class="mb-6">
+      <%= link_to user_playlist_path(@playlist.id), class: "inline-flex items-center text-white/80 hover:text-white transition-colors duration-200" do %>
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Retour à la playlist
+      <% end %>
+    </div>
 
-      <div class="text-3xl font-semibold text-center text-gray-700 my-6">
-        <span id="track-placeholder">???</span>
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
+      <h1 class="text-4xl font-bold text-center text-white mb-8">Blind Test</h1>
+
+      <div class="text-3xl font-semibold text-center text-white/90 my-6">
+        <span id="track-placeholder" class="bg-white/5 px-6 py-3 rounded-full inline-block">???</span>
       </div>
 
       <div id="player-container" class="hidden">
-        <div class="w-full rounded-lg overflow-hidden shadow-md my-6">
+        <div class="w-full rounded-xl overflow-hidden shadow-xl my-6 bg-white/5 backdrop-blur-lg">
           <iframe id="spotify-player"
                   class="w-full"
                   height="152"
@@ -22,7 +31,7 @@
                   allow="encrypted-media">
           </iframe>
         </div>
-        <div class="text-xl text-center text-gray-600 mb-6">
+        <div class="text-xl text-center text-white/80 mb-6">
           <span id="track-name"></span>
         </div>
       </div>
@@ -30,16 +39,23 @@
       <div class="flex justify-center space-x-4 my-8">
         <%= form_tag play_user_path(@user, id: @playlist.id), method: :post, class: "inline", id: "play-form" do %>
           <%= hidden_field_tag :track_id, @tracks[session[:current_track_index] || 0].id, id: "current-track-id" %>
-          <%= button_tag "Play", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50" %>
+          <%= hidden_field_tag :action_type, "resume", id: "action-type" %>
+          <%= button_tag "Play", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-lg hover:shadow-green-500/50", id: "play-button" %>
         <% end %>
 
         <button id="reveal-btn" onclick="revealTrack()"
-                class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-lg hover:shadow-blue-500/50">
           Réponse
         </button>
 
+        <%= form_tag play_user_path(@user, id: @playlist.id), method: :post, class: "inline", id: "pause-form" do %>
+          <%= hidden_field_tag :track_id, @tracks[session[:current_track_index] || 0].id, id: "pause-track-id" %>
+          <%= hidden_field_tag :action_type, "pause" %>
+          <%= button_tag "Pause", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-lg hover:shadow-green-500/50", id: "pause-button" %>
+        <% end %>
+
         <%= form_tag next_track_user_path(@user, id: @playlist.id), method: :post, class: "inline", id: "next-form" do %>
-          <%= button_tag "Next", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50" %>
+          <%= button_tag "Next", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-lg hover:shadow-green-500/50" %>
         <% end %>
       </div>
     </div>
@@ -57,13 +73,38 @@
     const trackName = document.getElementById('track-name');
     const revealBtn = document.getElementById('reveal-btn');
     const currentTrackId = document.getElementById('current-track-id');
+    const pauseTrackId = document.getElementById('pause-track-id');
+    const playButton = document.getElementById('play-button');
+    const pauseButton = document.getElementById('pause-button');
+    const playForm = document.getElementById('play-form');
+    const pauseForm = document.getElementById('pause-form');
+    const nextForm = document.getElementById('next-form');
+
+    let isPlaying = false;
 
     function updateTrackInfo() {
       const track = tracks[currentTrackIndex];
       currentTrackId.value = track.id;
+      pauseTrackId.value = track.id;
       player.src = `https://open.spotify.com/embed/track/${track.id}`;
       playerContainer.classList.add('hidden');
       revealBtn.textContent = 'Réponse';
+      isPlaying = false;
+      updateButtonStates();
+    }
+
+    function updateButtonStates() {
+      if (isPlaying) {
+        playButton.classList.add('opacity-50', 'cursor-not-allowed');
+        playButton.disabled = true;
+        pauseButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        pauseButton.disabled = false;
+      } else {
+        playButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        playButton.disabled = false;
+        pauseButton.classList.add('opacity-50', 'cursor-not-allowed');
+        pauseButton.disabled = true;
+      }
     }
 
     function revealTrack() {
@@ -78,8 +119,42 @@
       }
     }
 
+    function autoPlay() {
+      const playForm = document.getElementById('play-form');
+      const formData = new FormData(playForm);
+      formData.set('action_type', 'play');
+
+      fetch(playForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        }
+      }).then(() => {
+        isPlaying = true;
+        updateButtonStates();
+      });
+    }
+
+    // Ajout des gestionnaires d'événements pour les formulaires
+    playForm.addEventListener('submit', function() {
+      isPlaying = true;
+      updateButtonStates();
+    });
+
+    pauseForm.addEventListener('submit', function() {
+      isPlaying = false;
+      updateButtonStates();
+    });
+
+    nextForm.addEventListener('submit', function() {
+      isPlaying = true;
+      updateButtonStates();
+    });
+
     // Initialisation
     updateTrackInfo();
+    autoPlay();
   </script>
 </body>
 </html>
