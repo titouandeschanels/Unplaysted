@@ -14,6 +14,10 @@ Rails.application.config.middleware.use OmniAuth::Builder do
              user-read-currently-playing
              playlist-read-private
              playlist-read-collaborative
+             app-remote-control
+             streaming
+             user-modify-playback-state
+             user-read-playback-state
            ].join(" ")
 end
 

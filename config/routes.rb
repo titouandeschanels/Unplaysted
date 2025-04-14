@@ -21,4 +21,12 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   get "users/playlist/:id", to: "users#playlist", as: :user_playlist
+  get "users/playlist/:id/play", to: "users#play", as: :user_playlist_play
+
+  resources :users do
+    member do
+      post :play
+      post :next_track
+    end
+  end
 end

@@ -27,9 +27,46 @@ class UsersController < ApplicationController
                 else
                   @playlists.first
                 end
+  end
 
-    puts @playlist
+  def play
+    @user = current_user
+    @spotify_user = current_spotify_user
+    @playlists = @spotify_user.playlists
 
+    @playlist = if params[:id]
+                  @playlists.find { |playlist| playlist.id == params[:id] }
+                else
+                  @playlists.first
+                end
+
+    @tracks = @playlist.tracks
+
+    return unless request.post?
+
+    track_id = params[:track_id]
+    @spotify_user.player.play(track_id)
+  end
+
+  def next_track
+    @user = current_user
+    @spotify_user = current_spotify_user
+    @playlists = @spotify_user.playlists
+
+    @playlist = if params[:id]
+                  @playlists.find { |playlist| playlist.id == params[:id] }
+                else
+                  @playlists.first
+                end
+
+    @tracks = @playlist.tracks
+
+    if request.post?
+      track_id = params[:track_id]
+ #     @spotify_user.player.play(track_id)
+    end
+
+    redirect_to play_user_path(@user, id: @playlist.id)
   end
 
   private
