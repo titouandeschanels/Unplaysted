@@ -8,11 +8,12 @@ Rails.application.config.middleware.use OmniAuth::Builder do
            Rails.application.credentials.dig(:spotify, :client_secret),
            scope: %w[
              user-read-email
-             playlist-modify-public
              user-library-read
              user-library-modify
              user-read-private
              user-read-currently-playing
+             playlist-read-private
+             playlist-read-collaborative
            ].join(" ")
 end
 

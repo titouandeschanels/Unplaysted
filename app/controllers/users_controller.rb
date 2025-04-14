@@ -14,8 +14,22 @@ class UsersController < ApplicationController
   def show
     @user = current_user
     @spotify_user = current_spotify_user
+    @playlists = @spotify_user.playlists.reverse
+  end
+
+  def playlist
+    @user = current_user
+    @spotify_user = current_spotify_user
     @playlists = @spotify_user.playlists
-    @tracks = @spotify_user.saved_tracks
+
+    @playlist = if params[:id]
+                  @playlists.find { |playlist| playlist.id == params[:id] }
+                else
+                  @playlists.first
+                end
+
+    puts @playlist
+
   end
 
   private

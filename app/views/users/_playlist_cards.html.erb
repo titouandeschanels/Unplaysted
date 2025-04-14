@@ -1,0 +1,27 @@
+<div>
+  <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+    <h2 class="text-xl font-bold text-white">Your Playlists</h2>
+
+    <div class="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+      <% playlists.each do |playlist| %>
+        <%= link_to user_playlist_path(id: playlist.id), class: "block" do %>
+          <div class="relative group">
+            <div class="relative h-72 w-full overflow-hidden rounded-lg">
+              <img src="<%= playlist.images.first&.dig('url') || 'https://placehold.co/400' %>"
+                   alt="<%= playlist.name %>"
+                   class="size-full object-cover transition-transform duration-300 group-hover:scale-110">
+            </div>
+            <div class="relative mt-4">
+              <h3 class="text-sm font-medium text-white"><%= playlist.name %></h3>
+              <p class="mt-1 text-sm text-gray-300"><%= playlist.total %> tracks</p>
+            </div>
+            <div class="absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4">
+              <div aria-hidden="true" class="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50"></div>
+              <p class="relative text-lg font-semibold text-white"><%= playlist.owner.display_name %></p>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
