@@ -29,7 +29,7 @@
 
       <div class="flex justify-center space-x-4 my-8">
         <%= form_tag play_user_path(@user, id: @playlist.id), method: :post, class: "inline", id: "play-form" do %>
-          <%= hidden_field_tag :track_id, "", id: "current-track-id" %>
+          <%= hidden_field_tag :track_id, @tracks[session[:current_track_index] || 0].id, id: "current-track-id" %>
           <%= button_tag "Play", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50" %>
         <% end %>
 
@@ -39,7 +39,6 @@
         </button>
 
         <%= form_tag next_track_user_path(@user, id: @playlist.id), method: :post, class: "inline", id: "next-form" do %>
-          <%= hidden_field_tag :track_id, "", id: "next-track-id" %>
           <%= button_tag "Next", type: "submit", class: "px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50" %>
         <% end %>
       </div>
@@ -50,18 +49,18 @@
     // Récupération des tracks depuis le contrôleur
     const tracks = <%= raw @tracks.map { |track| { id: track.id, name: track.name, artists: track.artists.map(&:name).join(", ") } }.to_json %>;
 
-    let currentTrackIndex = 0;
+    // Get the current track index from the server
+    const currentTrackIndex = <%= session[:current_track_index] || 0 %>;
+
     const player = document.getElementById('spotify-player');
     const playerContainer = document.getElementById('player-container');
     const trackName = document.getElementById('track-name');
     const revealBtn = document.getElementById('reveal-btn');
     const currentTrackId = document.getElementById('current-track-id');
-    const nextTrackId = document.getElementById('next-track-id');
 
     function updateTrackInfo() {
       const track = tracks[currentTrackIndex];
       currentTrackId.value = track.id;
-      nextTrackId.value = track.id;
       player.src = `https://open.spotify.com/embed/track/${track.id}`;
       playerContainer.classList.add('hidden');
       revealBtn.textContent = 'Réponse';
