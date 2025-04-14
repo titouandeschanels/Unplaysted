@@ -63,10 +63,17 @@ class UsersController < ApplicationController
 
     if request.post?
       track_id = params[:track_id]
- #     @spotify_user.player.play(track_id)
+      #     @spotify_user.player.play(track_id)
     end
 
     redirect_to play_user_path(@user, id: @playlist.id)
+  end
+
+  def destroy
+    session[:user_id] = nil
+    Current.user = nil
+    Current.spotify_user = nil
+    redirect_to root_path, notice: "Vous avez été déconnecté avec succès."
   end
 
   private
